@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>write</title>
+<link href="/css/style.css" rel="stylesheet">
+<link rel="stylesheet" href="/css/text_area.css">
+</head>
+<body class="write">
+	<div id="wrap">
+		<th:block th:replace="~{layout/header::header(${session.loginUser})}"></th:block>
+		<form id="boardForm" method="post" name="boardForm" action="/board/write" enctype="multipart/form-data">
+			<input type="hidden" th:value="${cri.pagenum}" name="pagenum">
+			<input type="hidden" th:value="${cri.amount}" name="amount">
+			<input type="hidden" th:value="${cri.type}" name="type">
+			<input type="hidden" th:value="${cri.keyword}" name="keyword">
+			<table border="1">
+				<tr>
+					<th>제목</th>
+					<td>
+						<input type="text" name="boardtitle" maxlength="50" placeholder="제목을 입력하세요">
+					</td>
+				</tr>
+				<tr>
+					<th>작성자</th>
+					<td>
+						<input type="text" name="userid" maxlength="50" th:value="${session.loginUser}" readonly>
+					</td>
+				</tr>
+				<tr>
+					<th>내용</th>
+					<td id="text_area">
+						<div class="editor-container">
+					        <div class="editor-toolbar">
+					            <button id="boldBtn" onclick="toggleStyle(event, 'boldBtn', 'bold')">B</button>
+					            <button id="italicBtn" onclick="toggleStyle(event, 'italicBtn', 'italic')">I</button>
+					            <button id="underlineBtn" onclick="toggleStyle(event, 'underlineBtn', 'underline')">U</button>
+					            <button id="strikeThroughBtn" onclick="toggleStyle(event, 'strikeThroughBtn', 'strikeThrough')">S</button>
+					            <button onclick="execCmd(event, 'justifyLeft')">Left</button>
+					            <button onclick="execCmd(event, 'justifyCenter')">Center</button>
+					            <button onclick="execCmd(event, 'justifyRight')">Right</button>
+					            <button onclick="execCmd(event, 'insertOrderedList')">OL</button>
+					            <button onclick="execCmd(event, 'insertUnorderedList')">UL</button>
+					            <button onclick="execCmd(event, 'createLink')">Link</button>
+					            <button onclick="execCmd(event, 'unlink')">Unlink</button>
+					            <input type="file" id="imageInput" accept="image/*" onchange="insertImage(event)" style="display:none;">
+					            <button onclick="event.preventDefault(); document.getElementById('imageInput').click()">Image</button>
+					        </div>
+					        <div id="editor" contenteditable="true"></div><!-- style="border: 1px solid black"; -->
+    					</div>
+					</td>
+				</tr>
+				<tr class="r0">
+					<th>파일 첨부1</th>
+					<td class="file0_cont">
+						<div>
+							<input type="file" name="files" id="file0" style="display:none">
+							<span id="file0name">선택된 파일 없음</span>
+						</div>
+						<div>
+							<a class="btn" href="javascript:upload(0)">파일 선택</a>
+							<a class="btn" href="javascript:cancelFile(0)">첨부 삭제</a>
+						</div>
+					</td>
+				</tr>
+			</table>
+		</form>
+		<table class="btn_area">
+			<tbody>
+				<tr>
+					<td>
+						<a class="btn" href="javascript:sendit();">등록</a>
+						<!-- <button class="btn" onclick="sendHTML()">Send HTML</button> -->
+						<a class="btn" th:href="${'/board/list' + cri.listLink}">목록</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="/js/text_area.js"></script>
+<script>
+	window.setTimeout(function(){
+		document.querySelector("#wrap>div:nth-child(1)").style.display="none";
+	},1200)
+	//현재 업로드된 파일의 개수(가장 마지막 행 번호)
+	let i = 0;
+	function sendit(){
+		const boardForm = document.boardForm;
+		
+		var btnAreaHTML = document.querySelector('#editor').outerHTML;
+        fetch('/board/write_two', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ html: btnAreaHTML })
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('서버 응답:', data);
+        })
+        .catch(error => {
+            console.error('서버 요청 실패:', error);
+        });
+		//유효성 검사
+		boardForm.submit();
+	}
+	function upload(num){
+		$("#file"+num).click();
+	}
+	//$(선택자).change(함수) : 해당 선택자의 요소에 변화가 일어난다면 넘겨주는 함수 호출
+	$("[type=file]").change(function(e){
+		//e : 파일이 업로드된 상황 자체를 담고있는 이벤트 객체
+		//e.target : 파일이 업로드가 된 input[type=file] 객체(태그객체)
+		const fileTag = e.target;
+		console.log(fileTag);
+		//e.target.files : 파일태그에 업로드가 된 파일들의 배열
+		const file = fileTag.files[0];
+		console.log(file);
+		
+		if(file == undefined){
+			//업로드 창을 띄웠다가 취소한 경우(파일이 업로드 되었다가 없어진 경우)
+			cancelFile(fileTag.id.split("e").pop());
+		}
+		else{
+			//파일을 업로드를 한 경우(없었다가 업로드, 있었는데 다른 파일로 업로드)
+			//#file0name 찾아서 내부 텍스트 변경(파일의 이름으로)
+			$("#"+fileTag.id+"name").text(file.name);
+			//업로드 된 파일의 확장자명			
+			let ext = file.name.split(".").pop();
+			if(ext == "jpeg" || ext == "png" || ext == "jpg" || ext == "webp" || ext == "gif"){
+				//".  file0       _cont"
+				$("."+fileTag.id+"_cont .thumbnail").remove();
+				const reader = new FileReader();
+				reader.onload = function(ie){
+					const img = document.createElement("img");
+					img.setAttribute("src",ie.target.result);
+					img.setAttribute("class","thumbnail");
+					document.querySelector("."+fileTag.id+"_cont").appendChild(img);
+				}
+				reader.readAsDataURL(file);
+			}
+			else{
+				$("."+fileTag.id+"_cont .thumbnail").remove();
+			}
+			
+			//가장 마지막 [파일 선택] 버튼을 눌렀을 때
+			if(fileTag.id == "file"+i){
+				const cloneElement = $(".r"+i).clone(true);
+				i++;
+				cloneElement.attr("class","r"+i);
+				cloneElement.children("th").text("파일 첨부"+(i+1));
+				cloneElement.children("td").attr("class","file"+i+"_cont");
+				
+				cloneElement.find("input[type='file']").attr("name","files");
+				cloneElement.find("input[type='file']").attr("id","file"+i);
+				cloneElement.find("input[type='file']").val("");
+				
+				cloneElement.find("span").attr("id","file"+i+"name");
+				cloneElement.find("span").text("선택된 파일 없음");
+				
+				//								  javascript:upload(  1  )
+				cloneElement.find("a")[0].href = "javascript:upload("+i+")";
+				//								  javascript:cancelFile(  1  )
+				cloneElement.find("a")[1].href = "javascript:cancelFile("+i+")";
+				
+				//jQuery객체.appendTo("부모선택자") : 해당 선택자의 자식으로 jQuery 객체 추가
+				cloneElement.appendTo("#boardForm tbody")
+				
+			}
+		}
+	})
+	function cancelFile(num){
+		//파일 업로드 했다가 취소로 파일을 삭제하는 경우에는 문자열로 넘어온다.
+		num = Number(num);
+		//가장 마지막 [첨부 삭제] 버튼을 누른 경우
+		if(num == i){ return; }
+		//tr 지우기
+		$(".r"+num).remove();
+		//지워진 다음 행 부터 숫자 바꿔주기
+		for(let j=num+1;j<=i;j++){
+			console.log(j);
+			const el = $("#boardForm tbody .r"+j);
+			el.attr("class","r"+(j-1));
+			
+			el.find("th").text("파일 첨부"+j);
+			el.find("td").attr("class","file"+(j-1)+"_cont");
+			
+			el.find("input[type=file]").attr("name","files");
+			el.find("input[type=file]").attr("id","file"+(j-1));
+			
+			el.find("span").attr("id","file"+(j-1)+"name");
+			
+			el.find("a")[0].href = "javascript:upload("+(j-1)+")";
+			el.find("a")[1].href = "javascript:cancelFile("+(j-1)+")";
+		}
+		i--;
+	}
+	
+	function execCmd(event, command) {
+	    event.preventDefault(); // 기본 동작 방지
+	    if (command === 'createLink') {
+	        let url = prompt('Enter the link here: ', 'http:\/\/');
+	        document.execCommand(command, false, url);
+	    } else {
+	        document.execCommand(command, false, null);
+	    }
+	}
+
+	function toggleStyle(event, btnId, style) {
+	    event.preventDefault(); // 기본 동작 방지
+	    var btn = document.getElementById(btnId);
+	    var isActive = btn.classList.contains('active');
+	    if (isActive) {
+	        document.execCommand('removeFormat', false, style);
+	        btn.style.backgroundColor = '';
+	        btn.classList.remove('active');
+	    } else {
+	        document.execCommand(style, false, null);
+	        btn.style.backgroundColor = 'lightgray'; // 활성화 시 배경색 변경
+	        btn.classList.add('active');
+	    }
+	}
+	
+   /*  function autoResize() {
+        var editor = document.getElementById("editor");
+        editor.style.height = "auto";
+        editor.style.height = editor.scrollHeight + "px";
+    } */
+
+    
+    function sendHTML() {
+        var btnAreaHTML = document.querySelector('#editor').outerHTML;
+
+        fetch('/board/write_two', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ html: btnAreaHTML })
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('서버 응답:', data);
+        })
+        .catch(error => {
+            console.error('서버 요청 실패:', error);
+        });
+    }
+</script>
+</html>
+
+
+
+

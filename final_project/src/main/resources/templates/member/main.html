@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <link rel="stylesheet" href="/css/main_sty.css">
+    <link rel="stylesheet" href="/css/map.css">
+</head>
+<body>
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=b80d880bf487c48bfc24c5920bfb84f0&libraries=services"></script>
+    <div class="profile-container">
+        <table>
+            <tr>
+                <td id="profile_area">
+                    <div class="profile-picture" style="background-image: url('/path/to/default/profile.jpg');">
+                    </div>
+                </td>
+                <td class="user-info">
+                    <p><strong>Name:</strong> <span th:text="${loginUser}">User</span></p>
+                    <p><strong>ID:</strong> <span th:text="${user.username}">Name</span></p>
+                    <p><strong>Address:</strong> <span th:text="${user.addrdetail}">Name</span></p>
+                    <button class="edit-button" onclick="showEditForm()">회원정보수정</button>
+                </td>
+            </tr>
+        </table>
+        
+        <div id="rvWrapper">
+	        <div id="roadview" style="width:100%;height:100%;"><p id="clickLatlng"></p></div> <!-- 로드뷰를 표시할 div 입니다 -->
+	        <div id="close" title="로드뷰닫기" onclick="closeRoadview()"><span class="img">
+	        </span></div>
+		</div>
+		
+        <div class="circle">
+            <p>작성한 게시글 수: <span th:text="${boardCnt}">User</span></p>
+            <a href="/board/list">게시판 바로가기</a>
+        </div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="map_wrap">
+		    <div id="map" style="width:100%;height:100%;position:relative;overflow:hidden;"></div>
+		
+		    <div id="menu_wrap" class="bg_white">
+		        <div class="option">
+		            <div>
+		                <form onsubmit="searchPlaces(); return false;">
+		                    키워드 : <input type="text" value="이태원 맛집" id="keyword" size="15"> 
+		                    <button type="submit">검색하기</button> 
+		                </form>
+		            </div>
+		        </div>
+		        <hr>
+		        <ul id="placesList"></ul>
+		        <div id="pagination"></div>
+		    </div>
+		</div>
+		
+		<div id="container">
+		    
+		    <div id="mapWrapper">
+		        <div id="roadview" style="width:100%;height:100%; background-color: red;"></div><!-- 지도를 표시할 div 입니다 -->
+		        <div id="roadviewControl" onclick="setRoadviewRoad()"></div>
+		    </div>
+		</div>
+    </div>
+
+<!-- <script>
+	function showEditForm() {
+	    document.getElementById('editForm').style.display = 'block';
+	}
+</script> -->
+    
+</body>
+<script src="/js/main/map.js"></script>
+<script src="/js/main/board.js"></script>
+</html>

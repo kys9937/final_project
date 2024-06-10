@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Editor</title>
+    <link rel="stylesheet" href="/css/text_area.css">
+</head>
+<body>
+     <div class="editor-container">
+        <div class="editor-toolbar">
+            <button id="boldBtn" onclick="toggleStyle('boldBtn', 'bold')">B</button>
+            <button id="italicBtn" onclick="toggleStyle('italicBtn', 'italic')">I</button>
+            <button id="underlineBtn" onclick="toggleStyle('underlineBtn', 'underline')">U</button>
+            <button id="strikeThroughBtn" onclick="toggleStyle('strikeThroughBtn', 'strikeThrough')">S</button>
+            <button onclick="execCmd('justifyLeft')">Left</button>
+            <button onclick="execCmd('justifyCenter')">Center</button>
+            <button onclick="execCmd('justifyRight')">Right</button>
+            <button onclick="execCmd('insertOrderedList')">OL</button>
+            <button onclick="execCmd('insertUnorderedList')">UL</button>
+            <button onclick="execCmd('createLink')">Link</button>
+            <button onclick="execCmd('unlink')">Unlink</button>
+            <input type="file" id="imageInput" accept="image/*" onchange="insertImage(event)" style="display:none;">
+            <button onclick="document.getElementById('imageInput').click()">Image</button>
+        </div>
+        <div id="editor" contenteditable="true"></div>
+    </div>
+
+    <script src="/js/text_area.js"></script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.final_project.mapper.BoardMapper">
+	<sql id="cri">
+		<if test="keyword != '' and type != ''">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach collection="typeArr" item="type">
+					or
+					<choose>
+						<when test="type == 'T'.toString()">
+							boardtitle like('%${keyword}%')
+						</when>
+						<when test="type == 'C'.toString()">
+							boardcontents like('%${keyword}%')
+						</when>
+						<when test="type == 'W'.toString()">
+							userid like('%${keyword}%')
+						</when>
+					</choose>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+	<!--
+		 이 sql코드는 반복해서 사용할 수 있다.
+		 아래 코드들에서 <include refid="cri"></include>를 통해 호출된다.
+		 만약 if에서 falue가 나와도 문제가 없도록 코드가 만들어져 있으며
+		 choose까지 들어가 userid like('%${keyword}%')해당 코드까지 실행 되어도
+		 trim을 통해 아래의 코드에 삽입되어도 문제가 없다.(trim에서 and 등 연결을 위한 문자열을 붙임)
+		 만약 쿼리문에서 문제가 생겨도 자체적으로 에러를 무시하거나 넘겨버려 웹 자체에는 에러가 발행하진 않는다.
+		 다만 기능적인 문제는 발샐 수도 있다.
+		 ${}값이 없거나 null이라면 출력시 null이 출력된다.
+	-->
+	
+	<insert id="insertBoard">
+		insert into user_board (boardtitle,boardcontents,userid)
+		values(#{boardtitle},#{boardcontents},#{userid})
+	</insert>
+	
+	
+	<select id="getList">
+		select * from user_board where
+		<include refid="cri"></include>
+		boardnum > 0 order by boardnum desc limit #{startrow},#{amount}
+	</select>
+	<select id="getTotal">
+		select count(*) from user_board where
+		<include refid="cri"></include>
+		boardnum > 0
+	</select>
+	<select id="getLastNum">
+		select max(boardnum) from user_board where userid=#{userid}
+	</select>
+	<select id="getBoardByNum">
+		select * from user_board where boardnum=#{boardnum}
+	</select>
+	
+	<update id="updateReadCount">
+		update user_board
+		set readcount = #{readcount}
+		where boardnum = #{boardnum}
+	</update>
+	<update id="updateBoard">
+		update user_board
+		set boardtitle=#{boardtitle}, boardcontents=#{boardcontents}, updatedate=now()
+		where boardnum=#{boardnum}
+	</update>
+	<delete id="deleteBoard">
+		delete from user_board where boardnum=#{boardnum}
+	</delete>
+	<select id="getUserTotal">
+		select count(*) from user_board where userid=#{loginUser}
+	</select>
+</mapper>
+
+
+

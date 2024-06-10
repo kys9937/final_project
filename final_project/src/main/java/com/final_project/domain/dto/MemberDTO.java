@@ -1,0 +1,15 @@
+package com.final_project.domain.dto;
+
+import lombok.Data;
+
+@Data
+public class MemberDTO {
+	private String userid;
+	private String userpw;
+    private String username;
+    private String usergender;
+    private String addr;
+    private String addrdetail;
+    private String addretc;
+    private String profile;//프사
+}

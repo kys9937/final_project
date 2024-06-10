@@ -1,0 +1,67 @@
+#text_area {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* top에서 flex-start로 변경 */
+            background-color: #f0f0f0;
+            position: relative;
+            height: auto;
+            min-height: 300px;
+            padding: 10px;
+        }
+
+        .editor-container {
+            width: 100%;
+            min-height: 100%;
+            height: auto; /* 높이를 내부 내용에 맞게 자동 조정 */
+            max-width: 800px;
+            background: #fff;
+            /* border: 1px solid #ddd; */
+            border-radius: 5px;
+            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+            overflow: hidden;
+            position: relative; /* absolute에서 relative로 변경 */
+            display: flex;
+            flex-direction: column; /* flexbox 레이아웃 설정 */
+        }
+
+        .editor-toolbar {
+            background: #f5f5f5;
+            /* border-bottom: 1px solid #ddd; */
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            display: flex;
+            width: 100%;
+            gap: 5px;
+            flex-wrap: wrap;
+            border-radius: 5px;
+        }
+
+        .editor-toolbar button {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+
+        .editor-toolbar button:hover {
+            background: #f0f0f0;
+        }
+
+        #editor {
+            flex: 1; /* flex-grow 속성을 추가하여 공간을 채움 */
+            height: auto; /* 높이를 내부 내용에 맞게 자동 조정 */
+            min-height: 300px;
+            width: 100%;
+            margin: 0;
+            outline: none;
+        }
+
+        .active {
+            font-weight: bold;
+            color: blue; /* 색을 원하는 색으로 변경하세요 */
+        }
