@@ -129,14 +129,13 @@ public class BoardController {
 	public void input_text() {
 	}
 	
-	@PostMapping("write_two")
-	@ResponseBody
-	public String write_two(@RequestBody write_twoDTO htmlRequest) {
-        String html = htmlRequest.getHtml();
-        System.out.println("Received HTML: " + html);
-        // 추가적인 처리 로직
-        return "HTML received successfully";
-    }
+	@PostMapping("/board/write_two")
+	@ResponseBody // 이 어노테이션을 사용하여 문자열 데이터로 처리됨을 명시적으로 지정합니다.
+	public String write_two(@RequestBody String htmlRequest) {
+	    System.out.println("Received HTML: " + htmlRequest);
+	    return htmlRequest; // 단순한 문자열을 반환합니다.
+	}
+
 		
 	
 }

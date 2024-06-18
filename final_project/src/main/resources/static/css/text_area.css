@@ -1,67 +1,18 @@
-#text_area {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* top에서 flex-start로 변경 */
-            background-color: #f0f0f0;
-            position: relative;
-            height: auto;
-            min-height: 300px;
-            padding: 10px;
-        }
-
-        .editor-container {
-            width: 100%;
-            min-height: 100%;
-            height: auto; /* 높이를 내부 내용에 맞게 자동 조정 */
-            max-width: 800px;
-            background: #fff;
-            /* border: 1px solid #ddd; */
-            border-radius: 5px;
-            /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
-            overflow: hidden;
-            position: relative; /* absolute에서 relative로 변경 */
-            display: flex;
-            flex-direction: column; /* flexbox 레이아웃 설정 */
-        }
-
-        .editor-toolbar {
-            background: #f5f5f5;
-            /* border-bottom: 1px solid #ddd; */
-            border-bottom: 1px solid #ddd;
-            padding: 10px;
-            display: flex;
-            width: 100%;
-            gap: 5px;
-            flex-wrap: wrap;
-            border-radius: 5px;
-        }
-
-        .editor-toolbar button {
-            background: #fff;
-            border: 1px solid #ddd;
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: background 0.3s;
-        }
-
-        .editor-toolbar button:hover {
-            background: #f0f0f0;
-        }
-
-        #editor {
-            flex: 1; /* flex-grow 속성을 추가하여 공간을 채움 */
-            height: auto; /* 높이를 내부 내용에 맞게 자동 조정 */
-            min-height: 300px;
-            width: 100%;
-            margin: 0;
-            outline: none;
-        }
-
-        .active {
-            font-weight: bold;
-            color: blue; /* 색을 원하는 색으로 변경하세요 */
-        }
+ #editor-container {
+    min-height: 300px;
+    width: 950px;
+    
+}
+#toolbar-container {
+    margin-bottom: 10px;
+}
+.ql-editor img {
+    max-width: 100%; /* 이미지의 최대 너비 설정 */
+    height: auto; /* 높이 자동 조정 */
+    cursor: pointer; /* 커서 모양 설정 */
+}
+#editor-container > * {
+    word-wrap: break-word; /* 긴 단어를 자동으로 줄바꿈하여 컨테이너 너비를 초과하지 않도록 설정 */
+	word-break: break-all; /* 단어가 컨테이너 너비를 초과할 경우 임의의 위치에서 줄바꿈 */
+	white-space: normal; /* 일반적인 공백 처리를 하여 텍스트가 자동으로 줄바꿈되도록 설정 */
+}
