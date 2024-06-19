@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.final_project.domain.dto.BoardDTO;
 import com.final_project.domain.dto.Criteria;
 import com.final_project.domain.dto.PageDTO;
-import com.final_project.domain.dto.write_twoDTO;
 import com.final_project.service.BoardService;
 
 import jakarta.servlet.http.Cookie;
@@ -22,7 +21,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -40,7 +38,7 @@ public class BoardController {
 		List<BoardDTO> list = service.getList(cri);
 		model.addAttribute("list",list);			//총 개시글의 수
 		model.addAttribute("pageMaker",new PageDTO(service.getTotal(cri), cri));
-//		model.addAttribute("hot_board",service.getHotBoardList(list));
+		model.addAttribute("hot_board",service.getHotBoardList(list));
 		model.addAttribute("reply_cnt_list",service.getReplyCntList(list));
 	}
 	
@@ -58,16 +56,16 @@ public class BoardController {
 			return "redirect:/board/list"+cri.getListLink();
 		}
 	}
+	
 	@GetMapping(value={"get", "modify"})
 	public String get(Criteria cri, long boardnum, HttpServletRequest req, HttpServletResponse resp, Model model) {
 		String requestURI = req.getRequestURI();
 		model.addAttribute("cri",cri);
 		HttpSession session = req.getSession();
-		//boardnum의 모든 데이터 대입
 		BoardDTO board = service.getDetail(boardnum);
 		model.addAttribute("board",board);
-		System.out.print("board: "+ boardnum);
 		model.addAttribute("files",service.getFiles(boardnum));
+		System.out.println(service.getFiles(boardnum));
 		String loginUser = (String)session.getAttribute("loginUser");
 		
 		if(requestURI.contains("modify")) {
@@ -86,7 +84,6 @@ public class BoardController {
 					}
 				}
 			}
-			
 			//read_board가 null이라는 뜻은 위에서 쿠키를 찾았을 때 존재하지 않았다는 뜻
 			//첫 조회거나 조회한지 1시간이 지난 후
 			if(read_board == null) {
@@ -124,20 +121,6 @@ public class BoardController {
 		return "redirect:/board/get"+cri.getListLink()+"&boardnum="+boardnum;
 		
 	}
-	
-	@GetMapping("text_area")
-	public void input_text() {
-	}
-	
-	@PostMapping("/board/write_two")
-	@ResponseBody // 이 어노테이션을 사용하여 문자열 데이터로 처리됨을 명시적으로 지정합니다.
-	public String write_two(@RequestBody String htmlRequest) {
-	    System.out.println("Received HTML: " + htmlRequest);
-	    return htmlRequest; // 단순한 문자열을 반환합니다.
-	}
-
-		
-	
 }
 
 
